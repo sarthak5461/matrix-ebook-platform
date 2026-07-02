@@ -1,0 +1,67 @@
+import { toast } from "sonner";
+import { loadRazorpay } from "@/lib/razorpay";
+
+export async function handleBuy(me, router) {
+  if (!me) {
+    router.push("/login?next=/dashboard&buy=1");
+    return;
+  }
+  if (me.purchasedBook) {
+    router.push("/reader");
+    return;
+  }
+  try {
+    const orderRes = await fetch("/api/payment/create-order", {
+      method: "POST",
+    });
+    const order = await orderRes.json();
+    if (!orderRes.ok) throw new Error(order.error || "Failed");
+    if (order.mock) {
+      const proceed = confirm(
+        `MOCK PAYMENT MODE\n\nEbook: Matrix Structural Analysis\nAmount: INR ${(order.amount / 100).toFixed(2)}\n\nPress OK to simulate a successful payment.`,
+      );
+      if (!proceed) return;
+      const verifyRes = await fetch("/api/payment/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: order.orderId,
+          razorpay_payment_id: "pay_mock",
+          razorpay_signature: "mock",
+        }),
+      });
+      const v = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(v.error || "Verify failed");
+      toast.success("Payment successful! Redirecting to reader...");
+      setTimeout(() => router.push("/reader"), 700);
+    } else {
+      // Real Razorpay - lazy load checkout script
+      const rz = await loadRazorpay();
+      const opts = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Matrix Structural Analysis",
+        description: "Lifetime reading access",
+        order_id: order.orderId,
+        prefill: { name: order.user.name, email: order.user.email },
+        theme: { color: "#0f172a" },
+        handler: async function (resp) {
+          const verifyRes = await fetch("/api/payment/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(resp),
+          });
+          if (verifyRes.ok) {
+            toast.success("Payment successful!");
+            router.push("/reader");
+          } else toast.error("Payment verification failed");
+        },
+      };
+      const r = new rz(opts);
+      r.open();
+    }
+  } catch (e) {
+    toast.error(e.message || "Something went wrong");
+  }
+}
