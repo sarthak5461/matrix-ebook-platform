@@ -17,23 +17,29 @@ export async function handleBuy(me, router) {
     const order = await orderRes.json();
     if (!orderRes.ok) throw new Error(order.error || "Failed");
     if (order.mock) {
-      const proceed = confirm(
-        `MOCK PAYMENT MODE\n\nEbook: Matrix Structural Analysis\nAmount: INR ${(order.amount / 100).toFixed(2)}\n\nPress OK to simulate a successful payment.`,
-      );
-      if (!proceed) return;
       const verifyRes = await fetch("/api/payment/verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           razorpay_order_id: order.orderId,
           razorpay_payment_id: "pay_mock",
           razorpay_signature: "mock",
         }),
       });
+
       const v = await verifyRes.json();
-      if (!verifyRes.ok) throw new Error(v.error || "Verify failed");
-      toast.success("Payment successful! Redirecting to reader...");
-      setTimeout(() => router.push("/reader"), 700);
+
+      if (!verifyRes.ok) {
+        throw new Error(v.error || "Verify failed");
+      }
+
+      toast.success("Payment successful!");
+
+      setTimeout(() => {
+        router.push("/reader");
+      }, 700);
     } else {
       // Real Razorpay - lazy load checkout script
       const rz = await loadRazorpay();

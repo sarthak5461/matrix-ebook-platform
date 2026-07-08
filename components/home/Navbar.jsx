@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 import { BookOpen, Menu, X } from "lucide-react";
+import { usePayment } from "@/app/contexts/PaymentContext";
 
 export default function Nav({ me, onBuy, onLogout }) {
   const [open, setOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function Nav({ me, onBuy, onLogout }) {
     { href: "#faq", label: "FAQ" },
     { href: "#contact", label: "Contact" },
   ];
+  const { openPayment } = usePayment();
   return (
     <header className='sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg'>
       <div className='container flex h-16 items-center justify-between'>
@@ -64,7 +66,7 @@ export default function Nav({ me, onBuy, onLogout }) {
                   </Button>
                 </Link>
               ) : (
-                <Button size='sm' onClick={() => handleBuy(me, router)}>
+                <Button size='sm' onClick={() => openPayment(onBuy)}>
                   Buy Ebook
                 </Button>
               )}
@@ -131,7 +133,10 @@ export default function Nav({ me, onBuy, onLogout }) {
                       <Button className='w-full'>Read Ebook</Button>
                     </Link>
                   ) : (
-                    <Button className='w-full' onClick={onBuy}>
+                    <Button
+                      className='w-full'
+                      onClick={() => openPayment(onBuy)}
+                    >
                       Buy Ebook
                     </Button>
                   )}

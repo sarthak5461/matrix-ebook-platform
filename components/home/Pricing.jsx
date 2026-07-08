@@ -9,6 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
+import { usePayment } from "@/app/contexts/PaymentContext";
 import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 
 export default function Pricing({ onBuy }) {
@@ -20,6 +21,7 @@ export default function Pricing({ onBuy }) {
     "Page navigation + zoom",
     "Future edition updates",
   ];
+  const { openPayment } = usePayment();
   return (
     <Section
       id='pricing'
@@ -53,7 +55,7 @@ export default function Pricing({ onBuy }) {
             <Button
               className='w-full h-12 mt-4 text-base'
               size='lg'
-              onClick={onBuy}
+              onClick={() => openPayment(onBuy)}
             >
               Buy Ebook Now <ArrowRight className='ml-2 h-4 w-4' />
             </Button>

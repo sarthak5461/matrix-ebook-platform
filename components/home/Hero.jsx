@@ -1,10 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { usePayment } from "@/app/contexts/PaymentContext";
 
 import { ShieldCheck, Infinity as InfIcon, ArrowRight } from "lucide-react";
 
 export default function Hero({ onBuy }) {
+  const { openPayment } = usePayment();
   return (
     <section className='relative overflow-hidden'>
       <div className='absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_60%)]' />
@@ -21,7 +23,11 @@ export default function Hero({ onBuy }) {
             Innovative, simple, unified & comprehensive eBook in PDF
           </p>
           <div className='mt-8 flex flex-wrap items-center gap-3'>
-            <Button size='lg' onClick={onBuy} className='h-12 px-6'>
+            <Button
+              size='lg'
+              onClick={() => openPayment(onBuy)}
+              className='h-12 px-6'
+            >
               Buy Ebook — INR 149 <ArrowRight className='ml-2 h-4 w-4' />
             </Button>
             <a href='#about-book'>

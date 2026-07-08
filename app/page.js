@@ -10,7 +10,8 @@ import Benefits from "@/components/home/Benefits";
 import Pricing from "@/components/home/Pricing";
 import Footer from "@/components/home/Footer";
 
-import useAuth from "@/hooks/useauth";
+import { useAuth } from "@/hooks/useAuth";
+
 import { handleBuy } from "@/services/payment.service";
 
 export default function HomePage() {
@@ -22,8 +23,8 @@ export default function HomePage() {
     await fetch("/api/auth/logout", {
       method: "POST",
     });
-
-    router.push("/");
+    router.replace("/");
+    router.refresh();
   };
 
   return (
