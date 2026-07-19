@@ -9,22 +9,18 @@ import AboutBook from "@/components/home/AboutBook";
 import Benefits from "@/components/home/Benefits";
 import Pricing from "@/components/home/Pricing";
 import Footer from "@/components/home/Footer";
-
 import { useAuth } from "@/hooks/useAuth";
-
 import { handleBuy } from "@/services/payment.service";
+import { logout as logoutUser } from "@/services/auth.service";
 
 export default function HomePage() {
-  const { me } = useAuth();
+  const { me, refreshUser } = useAuth();
   const router = useRouter();
   const buyBook = () => handleBuy(me, router);
 
   const logout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
-    router.replace("/");
-    router.refresh();
+    await logoutUser();
+    await refreshUser();
   };
 
   return (

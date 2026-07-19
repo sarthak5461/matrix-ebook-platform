@@ -7,23 +7,24 @@ export function useAuth() {
   const [me, setMe] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const data = await getCurrentUser();
-
-        setMe(data.user || null);
-      } finally {
-        setLoading(false);
-      }
+  async function refreshUser() {
+    try {
+      const data = await getCurrentUser();
+      console.log("refreshUser:", data);
+      setMe(data.user || null);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    loadUser();
+  useEffect(() => {
+    refreshUser();
   }, []);
 
   return {
     me,
     setMe,
     loading,
+    refreshUser,
   };
 }

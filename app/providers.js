@@ -2,8 +2,10 @@
 
 // Client-only context wrapper. QueryClient is created once at module load.
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { PaymentProvider } from "@/app/contexts/PaymentContext";
+import { AuthProvider } from "./contexts/AuthContext";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -15,8 +17,8 @@ const queryClient = new QueryClient({
 
 export function Providers({ children }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <PaymentProvider>{children}</PaymentProvider>
-    </QueryClientProvider>
+    </AuthProvider>
   );
 }

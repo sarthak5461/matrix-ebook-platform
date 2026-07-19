@@ -42,7 +42,10 @@ export async function handleBuy(me, router) {
       }, 700);
     } else {
       // Real Razorpay - lazy load checkout script
-      const rz = await loadRazorpay();
+      const Razorpay = await loadRazorpay();
+      if (!Razorpay) {
+        throw new Error("Unable to load Razorpay.");
+      }
       const opts = {
         key: order.keyId,
         amount: order.amount,
@@ -64,8 +67,8 @@ export async function handleBuy(me, router) {
           } else toast.error("Payment verification failed");
         },
       };
-      const r = new rz(opts);
-      r.open();
+      const razorpay = new Razorpay(opts);
+      razorpay.open();
     }
   } catch (e) {
     toast.error(e.message || "Something went wrong");

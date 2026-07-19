@@ -1,7 +1,10 @@
 async function request(url, options = {}) {
-  const res = await fetch(url, options);
+  const res = await fetch(url, {
+    cache: "no-store",
+    ...options,
+  });
 
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
     throw new Error(data.error || "Something went wrong");
@@ -25,6 +28,7 @@ export function login(credentials) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify(credentials),
   });
@@ -35,6 +39,7 @@ export function register(user) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify(user),
   });
@@ -45,6 +50,7 @@ export function forgotPassword(email) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify({ email }),
   });
@@ -55,6 +61,7 @@ export function resetPassword(token, password) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify({
       token,

@@ -1,39 +1,17 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
-import Link from "next/link";
+import { useRef, useState } from "react";
 import { uploadPdf as uploadPdfService } from "@/services/admin.service";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import StatsCard from "@/components/admin/StatsCard";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import UploadCard from "@/components/admin/UploadCard";
+import ExportCard from "@/components/admin/ExportCard";
+import UsersTable from "@/components/admin/UsersTable";
+import PurchasesTable from "@/components/admin/PurchasesTable";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import {
-  Users,
-  ShoppingCart,
-  IndianRupee,
-  Download,
-  Upload,
-  BookOpen,
-  Home,
-  LogOut,
-  RefreshCw,
-} from "lucide-react";
+import { Users, ShoppingCart, IndianRupee, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -60,12 +38,8 @@ export default function AdminPage() {
     }
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
       const data = await uploadPdfService(file);
-
       setPdfInfo(data);
-
       toast.success(`Uploaded! ${data.pageCount} pages`);
     } catch (e) {
       toast.error(e.message);
@@ -89,36 +63,7 @@ export default function AdminPage() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <header className='border-b bg-white'>
-        <div className='container h-16 flex items-center justify-between'>
-          <Link href='/' className='flex items-center gap-2 font-bold'>
-            <div className='h-8 w-8 rounded-md bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center'>
-              <BookOpen className='h-4 w-4 text-white' />
-            </div>
-            MatrixSA{" "}
-            <Badge variant='outline' className='ml-2'>
-              Admin
-            </Badge>
-          </Link>
-          <div className='flex items-center gap-2'>
-            <Link href='/'>
-              <Button variant='ghost' size='sm'>
-                <Home className='h-4 w-4 mr-1' />
-                Home
-              </Button>
-            </Link>
-            <Link href='/dashboard'>
-              <Button variant='ghost' size='sm'>
-                Dashboard
-              </Button>
-            </Link>
-            <Button variant='outline' size='sm' onClick={logout}>
-              <LogOut className='h-4 w-4 mr-1' />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader onLogout={logout} />
       <main className='container py-10 space-y-8'>
         <div className='flex items-center justify-between'>
           <div>
@@ -153,56 +98,14 @@ export default function AdminPage() {
             accent='bg-indigo-100 text-indigo-700'
           />
         </div>
+        <UploadCard
+          uploading={uploading}
+          fileRef={fileRef}
+          uploadPdf={uploadPdf}
+          pdfInfo={pdfInfo}
+        />
 
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
-            <div>
-              <CardTitle>Ebook File</CardTitle>
-              <CardDescription>
-                Upload/replace the private PDF. Stored server-side only.
-              </CardDescription>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                ref={fileRef}
-                type='file'
-                accept='application/pdf'
-                onChange={uploadPdf}
-                className='hidden'
-              />
-              <Button
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-              >
-                <Upload className='h-4 w-4 mr-1' />
-                {uploading ? "Uploading..." : "Upload PDF"}
-              </Button>
-            </div>
-          </CardHeader>
-          {pdfInfo && (
-            <CardContent className='text-sm text-muted-foreground'>
-              Current PDF:{" "}
-              <span className='font-medium text-foreground'>
-                {pdfInfo.pageCount} pages
-              </span>
-            </CardContent>
-          )}
-        </Card>
-
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
-            <div>
-              <CardTitle>Sales Report</CardTitle>
-              <CardDescription>Export paid purchases as CSV</CardDescription>
-            </div>
-            <a href='/api/admin/export.csv' target='_blank' rel='noreferrer'>
-              <Button variant='outline'>
-                <Download className='h-4 w-4 mr-1' />
-                Export CSV
-              </Button>
-            </a>
-          </CardHeader>
-        </Card>
+        <ExportCard />
 
         <Tabs defaultValue='purchases'>
           <TabsList>
@@ -211,102 +114,13 @@ export default function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value='users'>Users ({users.length})</TabsTrigger>
           </TabsList>
+
           <TabsContent value='purchases'>
-            <Card>
-              <CardContent className='pt-6 overflow-x-auto'>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {purchases.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={6}
-                          className='text-center text-muted-foreground py-6'
-                        >
-                          No purchases yet
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {purchases.map((p) => (
-                      <TableRow key={p.id}>
-                        <TableCell className='font-medium'>
-                          {p.userName}
-                        </TableCell>
-                        <TableCell>{p.userEmail}</TableCell>
-                        <TableCell className='font-mono text-xs'>
-                          {p.razorpayOrderId}
-                        </TableCell>
-                        <TableCell>₹{(p.amount / 100).toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              p.status === "paid" ? "default" : "outline"
-                            }
-                            className={
-                              p.status === "paid" ? "bg-emerald-600" : ""
-                            }
-                          >
-                            {p.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {p.purchasedAt
-                            ? new Date(p.purchasedAt).toLocaleString()
-                            : "—"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <PurchasesTable purchases={purchases} />
           </TabsContent>
+
           <TabsContent value='users'>
-            <Card>
-              <CardContent className='pt-6 overflow-x-auto'>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Purchased</TableHead>
-                      <TableHead>Joined</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((u) => (
-                      <TableRow key={u.id}>
-                        <TableCell className='font-medium'>{u.name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>
-                          <Badge variant='outline'>{u.role}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          {u.purchasedBook ? (
-                            <Badge className='bg-emerald-600'>Yes</Badge>
-                          ) : (
-                            <Badge variant='outline'>No</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(u.createdAt).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <UsersTable users={users} />
           </TabsContent>
         </Tabs>
       </main>

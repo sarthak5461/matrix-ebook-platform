@@ -1,76 +1,38 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Home, LogOut, Badge } from "lucide-react";
 
-import {
-  LayoutDashboard,
-  Users,
-  CreditCard,
-  BookOpen,
-  Settings,
-} from "lucide-react";
-
-const links = [
-  {
-    title: "Dashboard",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Users",
-    href: "/admin/users",
-    icon: Users,
-  },
-  {
-    title: "Purchases",
-    href: "/admin/purchases",
-    icon: CreditCard,
-  },
-  {
-    title: "Ebook",
-    href: "/admin/ebook",
-    icon: BookOpen,
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-  },
-];
-
-export default function AdminSidebar() {
-  const pathname = usePathname();
-
+export default function AdminHeader({ onLogout }) {
   return (
-    <aside className='w-64 border-r bg-white h-screen'>
-      <div className='h-16 border-b flex items-center px-6'>
-        <h2 className='text-xl font-bold'>
-          Matrix<span className='text-indigo-600'>SA</span>
-        </h2>
+    <header className='border-b bg-white'>
+      <div className='container h-16 flex items-center justify-between'>
+        <Link href='/' className='flex items-center gap-2 font-bold'>
+          <div className='h-8 w-8 rounded-md bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center'>
+            <BookOpen className='h-4 w-4 text-white' />
+          </div>
+          MatrixSA{" "}
+          <Badge variant='outline' className='ml-2'>
+            Admin
+          </Badge>
+        </Link>
+        <div className='flex items-center gap-2'>
+          <Link href='/'>
+            <Button variant='ghost' size='sm'>
+              <Home className='h-4 w-4 mr-1' />
+              Home
+            </Button>
+          </Link>
+          <Link href='/dashboard'>
+            <Button variant='ghost' size='sm'>
+              Dashboard
+            </Button>
+          </Link>
+          <Button variant='outline' size='sm' onClick={onLogout}>
+            <LogOut className='h-4 w-4 mr-1' />
+            Logout
+          </Button>
+        </div>
       </div>
-
-      <nav className='p-4 space-y-2'>
-        {links.map((link) => {
-          const Icon = link.icon;
-
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-3 rounded-lg px-4 py-3 transition
-                ${
-                  pathname === link.href
-                    ? "bg-indigo-600 text-white"
-                    : "hover:bg-slate-100 text-slate-700"
-                }`}
-            >
-              <Icon size={18} />
-              {link.title}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+    </header>
   );
 }
