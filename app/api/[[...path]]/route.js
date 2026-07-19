@@ -210,51 +210,6 @@ async function handler(request, { params }) {
 
     // ===== Payments =====
 
-    if (route === "/payment/verify" && method === "POST") {
-      const auth = await requireUser();
-      if (auth.error) return json({ error: auth.error }, auth.status);
-      const user = auth.user;
-      const body = await request.json();
-      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-        body || {};
-      if (!razorpay_order_id) return json({ error: "Missing order id" }, 400);
-
-      const purchase = await db
-        .collection("purchases")
-        .findOne({ razorpayOrderId: razorpay_order_id, userId: user.id });
-      if (!purchase) return json({ error: "Order not found" }, 404);
-
-      const mock = purchase.mock === true;
-      let valid = false;
-      if (mock) {
-        valid = true;
-      } else {
-        const secret = process.env.RAZORPAY_KEY_SECRET;
-        const expected = crypto
-          .createHmac("sha256", secret)
-          .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-          .digest("hex");
-        valid = expected === razorpay_signature;
-      }
-      if (!valid) return json({ error: "Invalid signature" }, 400);
-
-      await db.collection("purchases").updateOne(
-        { id: purchase.id },
-        {
-          $set: {
-            razorpayPaymentId:
-              razorpay_payment_id || "pay_mock_" + uuidv4().slice(0, 8),
-            status: "paid",
-            purchasedAt: new Date(),
-          },
-        },
-      );
-      await db
-        .collection("users")
-        .updateOne({ id: user.id }, { $set: { purchasedBook: true } });
-      return json({ ok: true });
-    }
-
     // ===== Ebook / Reader (protected) =====
     if (route === "/reader/info" && method === "GET") {
       const auth = await requireUser();
