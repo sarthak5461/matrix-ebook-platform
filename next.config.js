@@ -51,10 +51,10 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Content-Security-Policy",
-            value: csp,
-          },
+          // {
+          //   key: "Content-Security-Policy",
+          //   value: csp,
+          // },
           {
             key: "X-Frame-Options",
             value: "DENY",
