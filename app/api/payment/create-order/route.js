@@ -15,7 +15,33 @@ export async function POST(request) {
     if (user.purchasedBook)
       return NextResponse.json({ error: "Already purchased" }, { status: 400 });
 
-    const price = Number(process.env.EBOOK_PRICE_INR || 149);
+    const existingPurchase = await db.collection("purchases").findOne({
+      userId: user.id,
+      status: "created",
+    });
+
+    if (existingPurchase) {
+      return NextResponse.json({
+        orderId: existingPurchase.razorpayOrderId,
+        amount: existingPurchase.amount,
+        currency: "INR",
+        keyId:
+          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+          process.env.RAZORPAY_KEY_ID ||
+          "rzp_test_MOCK",
+        mock: existingPurchase.mock,
+        user: {
+          name: user.name,
+          email: user.email,
+        },
+      });
+    }
+
+    const price = Number(process.env.EBOOK_PRICE_INR ?? 149);
+
+    if (!Number.isFinite(price) || price <= 0) {
+      throw new Error("Invalid EBOOK_PRICE_INR configuration.");
+    }
     const amount = price * 100; // paise
     const mock =
       process.env.MOCK_RAZORPAY === "true" ||
@@ -50,15 +76,21 @@ export async function POST(request) {
       });
       if (!rzpRes.ok) {
         const err = await rzpRes.text();
+
+        console.error("Razorpay create order failed:", err);
         return NextResponse.json(
-          { error: "Razorpay order failed", details: err },
-          { status: 500 },
+          {
+            error: "Unable to create payment order.",
+          },
+          {
+            status: 500,
+          },
         );
       }
       order = await rzpRes.json();
     }
 
-    await db.collection("purchases").insertOne({
+    const result = await db.collection("purchases").insertOne({
       id: uuidv4(),
       userId: user.id,
       razorpayOrderId: order.id,
@@ -69,6 +101,10 @@ export async function POST(request) {
       createdAt: new Date(),
       mock,
     });
+
+    if (!result.acknowledged) {
+      throw new Error("Failed to create purchase.");
+    }
 
     return NextResponse.json({
       orderId: order.id,

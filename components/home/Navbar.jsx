@@ -17,8 +17,6 @@ export default function Nav({ me, onBuy, onLogout }) {
     { href: "#about-book", label: "About Book" },
     { href: "#benefits", label: "Benefits" },
     { href: "#pricing", label: "Pricing" },
-    { href: "#faq", label: "FAQ" },
-    { href: "#contact", label: "Contact" },
   ];
   const { openPayment } = usePayment();
   return (
@@ -45,35 +43,44 @@ export default function Nav({ me, onBuy, onLogout }) {
         </nav>
         <div className='hidden md:flex items-center gap-2'>
           {me ? (
-            <>
-              {me.role === "admin" && (
+            me.role === "admin" ? (
+              <>
                 <Link href='/admin'>
                   <Button variant='ghost' size='sm'>
                     Admin
                   </Button>
                 </Link>
-              )}
-              <Link href='/dashboard'>
-                <Button variant='ghost' size='sm'>
-                  Dashboard
+
+                <Button variant='outline' size='sm' onClick={onLogout}>
+                  Logout
                 </Button>
-              </Link>
-              {me.purchasedBook ? (
-                <Link href='/reader'>
-                  <Button size='sm'>
-                    <BookOpen className='h-4 w-4 mr-1' />
-                    Read
+              </>
+            ) : (
+              <>
+                <Link href='/dashboard'>
+                  <Button variant='ghost' size='sm'>
+                    Dashboard
                   </Button>
                 </Link>
-              ) : (
-                <Button size='sm' onClick={() => openPayment(onBuy)}>
-                  Buy Ebook
+
+                {me.purchasedBook ? (
+                  <Link href='/reader'>
+                    <Button size='sm'>
+                      <BookOpen className='h-4 w-4 mr-1' />
+                      Read
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button size='sm' onClick={() => openPayment(onBuy)}>
+                    Buy Ebook
+                  </Button>
+                )}
+
+                <Button variant='outline' size='sm' onClick={onLogout}>
+                  Logout
                 </Button>
-              )}
-              <Button variant='outline' size='sm' onClick={onLogout}>
-                Logout
-              </Button>
-            </>
+              </>
+            )
           ) : (
             <>
               <Link href='/login'>
@@ -81,11 +88,13 @@ export default function Nav({ me, onBuy, onLogout }) {
                   Login
                 </Button>
               </Link>
+
               <Link href='/register'>
                 <Button variant='outline' size='sm'>
                   Register
                 </Button>
               </Link>
+
               <Button size='sm' onClick={onBuy}>
                 Buy Ebook
               </Button>

@@ -16,17 +16,17 @@ export default function AdminHeader({ onLogout }) {
           </Badge>
         </Link>
         <div className='flex items-center gap-2'>
-          <Link href='/'>
+          {/* <Link href='/'>
             <Button variant='ghost' size='sm'>
               <Home className='h-4 w-4 mr-1' />
               Home
             </Button>
-          </Link>
-          <Link href='/dashboard'>
+          </Link> */}
+          {/* <Link href='/dashboard'>
             <Button variant='ghost' size='sm'>
               Dashboard
             </Button>
-          </Link>
+          </Link> */}
           <Button variant='outline' size='sm' onClick={onLogout}>
             <LogOut className='h-4 w-4 mr-1' />
             Logout

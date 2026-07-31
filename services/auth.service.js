@@ -45,15 +45,22 @@ export function register(user) {
   });
 }
 
-export function forgotPassword(email) {
-  return request("/api/auth/forgot-password", {
+export async function forgotPassword(email) {
+  const res = await fetch("/api/auth/forgot-password", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
     },
     body: JSON.stringify({ email }),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error);
+  }
+
+  return data;
 }
 
 export function resetPassword(token, password) {

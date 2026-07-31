@@ -15,16 +15,25 @@ import {
 import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
 import { resetPassword } from "@/services/auth.service";
+import { Eye, EyeOff } from "lucide-react";
+
 function Inner() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token") || "";
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match.");
+        return;
+      }
       await resetPassword(token, password);
       toast.success("Password updated!");
       router.push("/login");
@@ -50,14 +59,55 @@ function Inner() {
         <CardContent>
           <form onSubmit={submit} className='space-y-4'>
             <div>
-              <Label>New password</Label>
-              <Input
-                type='password'
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Label>New Password</Label>
+
+              <div className='relative'>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className='pr-10'
+                />
+
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                >
+                  {showPassword ? (
+                    <EyeOff className='h-4 w-4' />
+                  ) : (
+                    <Eye className='h-4 w-4' />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div>
+              <Label>Confirm Password</Label>
+
+              <div className='relative'>
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className='pr-10'
+                />
+
+                <button
+                  type='button'
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className='h-4 w-4' />
+                  ) : (
+                    <Eye className='h-4 w-4' />
+                  )}
+                </button>
+              </div>
             </div>
             <Button className='w-full' disabled={loading || !token}>
               {loading ? "Updating..." : "Update password"}

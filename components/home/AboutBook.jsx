@@ -1,19 +1,17 @@
 "use client";
 
-import Section from "@/components/ui/section";
+import Section from "@/components/ui/Section";
 
 export default function AboutBook() {
   const chapters = [
     "Introduction to Matrix Structural Analysis",
-    "Skeletal Structures",
-    "Stiffness Matrix Method",
-    "Element Analysis",
-    "Structural Dynamics",
-    "Stability of Structures",
-    "Degree(s) Of Freedom",
-    "Computer Implementation",
-    "Case Studies",
-    "Advanced Topics",
+    "Direct stiffness Matrix Method for space Frame",
+    "Direct stiffness Matrix Method for Other Skeletal Structures",
+    "Computer Program for Direct Stiffness Matrix Analysis",
+    "Flexibility Matrix Method",
+    "Transfer Matrix Method",
+    "Non-Linear Analysis",
+    "Solved Examples",
   ];
   return (
     <Section

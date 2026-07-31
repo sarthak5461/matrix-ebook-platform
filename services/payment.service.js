@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { loadRazorpay } from "@/lib/razorpay";
+import loadRazorpay from "@/lib/razorpay";
 
 export async function handleBuy(me, router) {
   if (!me) {

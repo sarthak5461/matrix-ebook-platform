@@ -28,10 +28,19 @@ function Inner() {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(form);
+      const data = await login(form);
+
       toast.success("Welcome back!");
-      if (shouldBuy) router.push("/?buy=1");
-      else router.push(next);
+
+      if (shouldBuy) {
+        router.push("/?buy=1");
+      } else if (params.get("next")) {
+        router.push(next);
+      } else if (data.user.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (e) {
       toast.error(e.message);
     } finally {

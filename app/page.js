@@ -30,7 +30,7 @@ export default function HomePage() {
       <AboutAuthor />
       <AboutBook />
       <Benefits />
-      <Pricing onBuy={buyBook} />
+      {!me?.purchasedBook && <Pricing onBuy={buyBook} />}
       <Footer />
     </div>
   );

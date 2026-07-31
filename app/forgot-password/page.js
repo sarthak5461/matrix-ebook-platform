@@ -23,11 +23,11 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      await forgotPassword(email);
-      toast.success("If your email exists, a reset link was sent.");
+      await forgotPassword(email.trim());
+      toast.success("A reset link was sent to your email.");
       setSent(true);
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -43,13 +43,17 @@ export default function ForgotPassword() {
             <span className='font-bold'>MatrixSA</span>
           </Link>
           <CardTitle className='text-2xl'>Forgot password?</CardTitle>
-          <CardDescription>We'll email a reset link to you.</CardDescription>
+          <CardDescription>
+            Enter the email address associated with your account and we'll send
+            you a password reset link.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {sent ? (
             <div className='text-sm text-muted-foreground'>
-              If an account exists for <b>{email}</b>, a reset link has been
-              sent. Check your inbox (and spam folder).
+              If an account exists for <b>{email}</b>, we've sent a password
+              reset link. The link expires in 1 hour. Check your inbox (and spam
+              folder).
               <div className='mt-4'>
                 <Link href='/login' className='text-indigo-600 hover:underline'>
                   Back to login
@@ -67,7 +71,7 @@ export default function ForgotPassword() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <Button className='w-full' disabled={loading}>
+              <Button className='w-full' disabled={loading || !email.trim()}>
                 {loading ? "Sending..." : "Send reset link"}
               </Button>
               <div className='text-center text-sm text-muted-foreground'>
