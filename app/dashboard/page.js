@@ -21,7 +21,10 @@ export default function Dashboard() {
     }
   }, [loggingOut, loading, me, router]);
 
-  const buy = () => handleBuy(me, router);
+  const buy = () => {
+    if (!me) return;
+    handleBuy(me, router);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -29,12 +32,13 @@ export default function Dashboard() {
     window.location.replace("/");
   };
 
-  if (loading)
+  if (loading || !me) {
     return (
       <div className='min-h-screen flex items-center justify-center text-muted-foreground'>
         Loading...
       </div>
     );
+  }
 
   return (
     <div className='min-h-screen bg-slate-50'>
@@ -42,7 +46,7 @@ export default function Dashboard() {
 
       <main className='container py-10'>
         <div className='mb-8'>
-          <h1 className='text-3xl font-bold'>Hello, {me.name}!</h1>
+          <h1 className='text-3xl font-bold'>Hello, {me?.name}!</h1>
           <p className='text-muted-foreground'>
             Manage your account and access your ebook.
           </p>
