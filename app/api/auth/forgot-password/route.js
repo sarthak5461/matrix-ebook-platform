@@ -4,12 +4,19 @@ import { sendResetPasswordEmail } from "@/lib/email/resetPassword";
 import crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
 import { forgotSchema } from "@/lib/validators";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
+    const limited = await applyRateLimit(request, limiters.forgotPassword);
+
+    if (limited) {
+      return limited;
+    }
+
     const body = await request.json();
     const parse = forgotSchema.safeParse(body);
     if (!parse.success)
@@ -46,7 +53,6 @@ export async function POST(request) {
       }
 
       const resetLink = `${base}/reset-password?token=${token}`;
-      // console.log("BASE URL:", process.env.NEXT_PUBLIC_BASE_URL);
       try {
         await sendResetPasswordEmail({
           email: user.email,

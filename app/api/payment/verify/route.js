@@ -6,12 +6,19 @@ import { verifyPaymentSchema } from "@/lib/validators";
 import crypto from "crypto";
 import { APP } from "@/lib/config/app";
 import { sendPurchaseConfirmationEmail } from "@/lib/email/purchaseConfirmation";
+import { limiters } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
+    const limited = await applyRateLimit(request, limiters.payment);
+
+    if (limited) {
+      return limited;
+    }
+
     const db = await getDb();
     const auth = await requireUser();
     if (auth.error)

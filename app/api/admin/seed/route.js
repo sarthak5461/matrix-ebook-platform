@@ -23,9 +23,17 @@ export async function POST() {
     const existing = await db.collection("users").findOne({ email });
 
     if (!existing) {
-      const passwordHash = await hashPassword(
-        process.env.ADMIN_PASSWORD || "Admin@123",
-      );
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      const adminName = process.env.ADMIN_NAME || "Site Admin";
+
+      if (!adminEmail || !adminPassword) {
+        throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be configured.");
+      }
+
+      const email = adminEmail.trim().toLowerCase();
+
+      const passwordHash = await hashPassword(adminPassword);
 
       const result = await db.collection("users").insertOne({
         id: uuidv4(),
@@ -40,8 +48,6 @@ export async function POST() {
       if (!result.acknowledged) {
         throw new Error("Failed to create admin.");
       }
-
-      console.log("Admin created:", email);
     } else if (existing.role !== "admin") {
       const result = await db.collection("users").updateOne(
         { id: existing.id },
@@ -56,10 +62,6 @@ export async function POST() {
       if (result.modifiedCount !== 1) {
         throw new Error("Failed to promote admin.");
       }
-
-      console.log("Existing user promoted to admin.");
-    } else {
-      console.log("Admin already exists.");
     }
     return NextResponse.json({
       ok: true,

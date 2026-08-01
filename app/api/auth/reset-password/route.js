@@ -3,6 +3,7 @@ import { getDb } from "@/lib/mongodb";
 import { hashPassword } from "@/lib/auth";
 import crypto from "crypto";
 import { resetSchema } from "@/lib/validators";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

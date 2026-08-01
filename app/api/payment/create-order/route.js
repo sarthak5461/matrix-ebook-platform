@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getDb } from "@/lib/mongodb";
 import { requireUser } from "@/lib/auth";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 

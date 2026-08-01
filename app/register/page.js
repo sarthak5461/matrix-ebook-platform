@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
 
 export default function Register() {
-  console.log("Register component rendered");
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);

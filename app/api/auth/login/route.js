@@ -2,12 +2,19 @@ import { getDb } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { setAuthCookie, signToken, comparePassword } from "@/lib/auth";
 import { loginSchema } from "@/lib/validators";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
+    const limited = await applyRateLimit(request, limiters.login);
+
+    if (limited) {
+      return limited;
+    }
+
     const body = await request.json();
     const parse = loginSchema.safeParse(body);
     if (!parse.success)

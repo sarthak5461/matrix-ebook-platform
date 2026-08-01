@@ -10,7 +10,6 @@ export function useAuth() {
   async function refreshUser() {
     try {
       const data = await getCurrentUser();
-      console.log("refreshUser:", data);
       setMe(data.user || null);
     } finally {
       setLoading(false);

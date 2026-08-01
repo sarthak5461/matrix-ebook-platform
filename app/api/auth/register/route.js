@@ -4,11 +4,18 @@ import { setAuthCookie, signToken, hashPassword } from "@/lib/auth";
 import { registerSchema } from "@/lib/validators";
 import { v4 as uuidv4 } from "uuid";
 import { sendWelcomeEmail } from "@/lib/email/welcome";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
+    const limited = await applyRateLimit(request, limiters.register);
+
+    if (limited) {
+      return limited;
+    }
+
     const body = await request.json();
     const parse = registerSchema.safeParse(body);
     if (!parse.success)
