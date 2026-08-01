@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getDb } from "@/lib/mongodb";
 import { requireUser } from "@/lib/auth";
+import { verifyPaymentSchema } from "@/lib/validators";
 import crypto from "crypto";
 import { APP } from "@/lib/config/app";
 import { sendPurchaseConfirmationEmail } from "@/lib/email/purchaseConfirmation";
