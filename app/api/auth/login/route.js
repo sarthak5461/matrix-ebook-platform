@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
+  console.log("========== LOGIN ROUTE HIT ==========");
   try {
     const limited = await applyRateLimit(request, limiters.login);
 
