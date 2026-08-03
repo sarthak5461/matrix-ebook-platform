@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import Razorpay from "razorpay";
 import { v4 as uuidv4 } from "uuid";
 import { getDb } from "@/lib/mongodb";
 import { requireUser } from "@/lib/auth";
@@ -59,35 +60,23 @@ export async function POST(request) {
       };
     } else {
       // Real Razorpay
-      const authStr = Buffer.from(
-        `${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`,
-      ).toString("base64");
-      const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${authStr}`,
-        },
-        body: JSON.stringify({
-          amount,
-          currency: "INR",
-          receipt: "rcpt_" + user.id.slice(0, 10),
-        }),
-      });
-      if (!rzpRes.ok) {
-        const err = await rzpRes.text();
 
-        console.error("Razorpay create order failed:", err);
-        return NextResponse.json(
-          {
-            error: "Unable to create payment order.",
-          },
-          {
-            status: 500,
-          },
-        );
-      }
-      order = await rzpRes.json();
+      const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      order = await razorpay.orders.create({
+        amount,
+        currency: "INR",
+        receipt: "rcpt_" + user.id.slice(0, 10),
+        notes: {
+          userId: user.id,
+          userEmail: user.email,
+          userName: user.name,
+        },
+      });
+      console.log("Razorpay Order:", order);
     }
 
     const result = await db.collection("purchases").insertOne({
