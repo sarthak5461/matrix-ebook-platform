@@ -6,7 +6,7 @@ import { verifyPaymentSchema } from "@/lib/validators";
 import crypto from "crypto";
 import { APP } from "@/lib/config/app";
 import { sendPurchaseConfirmationEmail } from "@/lib/email/purchaseConfirmation";
-import { limiters } from "@/lib/rateLimiter";
+import { applyRateLimit, limiters } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
