@@ -33,28 +33,30 @@ const nextConfig = {
 
     const csp = [
       "default-src 'self'",
-      `script-src 'self' ${
-        isDev ? "'unsafe-inline' 'unsafe-eval'" : ""
-      } https://checkout.razorpay.com https://cdn.jsdelivr.net`,
+      `script-src 'self' ${"connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com"} https://checkout.razorpay.com https://cdn.jsdelivr.net/npm`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.razorpay.com ws: wss:",
-      "frame-src https://checkout.razorpay.com",
+      "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+      "frame-src 'self' https://checkout.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
+      "worker-src 'self' blob: https://cdn.jsdelivr.net",
+      "media-src 'self'",
+      "manifest-src 'self'",
+      "upgrade-insecure-requests",
     ].join("; ");
 
     return [
       {
         source: "/(.*)",
         headers: [
-          // {
-          //   key: "Content-Security-Policy",
-          //   value: csp,
-          // },
+          {
+            key: "Content-Security-Policy",
+            value: csp,
+          },
           {
             key: "X-Frame-Options",
             value: "DENY",
