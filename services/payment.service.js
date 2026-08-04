@@ -56,7 +56,6 @@ export async function handleBuy(me, router) {
         prefill: { name: order.user.name, email: order.user.email },
         theme: { color: "#0f172a" },
         handler: async function (resp) {
-          console.log("========== HANDLER START ==========");
           console.log(resp);
           const verifyRes = await fetch("/api/payment/verify", {
             method: "POST",
@@ -73,26 +72,19 @@ export async function handleBuy(me, router) {
             toast.success("Payment successful!");
             router.push("/reader");
           } else toast.error("Payment verification failed");
-
-          console.log("Redirecting...");
         },
       };
-      console.log("Opening Razorpay", opts);
       const razorpay = new Razorpay(opts);
 
       razorpay.on("payment.failed", function (response) {
-        console.log("PAYMENT FAILED");
         console.log(response);
       });
 
       razorpay.on("payment.submit", function (response) {
-        console.log("PAYMENT SUBMITTED");
         console.log(response);
       });
 
-      razorpay.on("modal.close", function () {
-        console.log("MODAL CLOSED");
-      });
+      razorpay.on("modal.close", function () {});
 
       razorpay.open();
     }
