@@ -55,11 +55,21 @@ export default function AdminPage() {
   };
 
   if (loading || adminLoading)
-    return (
-      <div className='min-h-screen flex items-center justify-center text-muted-foreground'>
-        Loading admin...
-      </div>
-    );
+    if (!me) {
+      router.replace("/login");
+      return null;
+    }
+
+  if (me.role !== "admin") {
+    router.replace("/");
+    return null;
+  }
+
+  return (
+    <div className='min-h-screen flex items-center justify-center text-muted-foreground'>
+      Loading admin...
+    </div>
+  );
 
   return (
     <div className='min-h-screen bg-slate-50'>
