@@ -31,17 +31,26 @@ const nextConfig = {
   async headers() {
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.jsdelivr.net",
+
+      "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://cdn.jsdelivr.net",
+      "script-src-elem 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://cdn.jsdelivr.net",
+
       "style-src 'self' 'unsafe-inline'",
+
       "img-src 'self' data: https:",
+
       "font-src 'self' data:",
-      "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
-      "frame-src 'self' https://checkout.razorpay.com",
+
+      "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://lumberjack.razorpay.com",
+
+      "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com",
+
+      "worker-src 'self' blob: https://cdn.jsdelivr.net",
+
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      "worker-src 'self' blob: https://cdn.jsdelivr.net",
       "media-src 'self'",
       "manifest-src 'self'",
       "upgrade-insecure-requests",
