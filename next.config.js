@@ -29,11 +29,9 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   async headers() {
-    const isDev = process.env.NODE_ENV === "development";
-
     const csp = [
       "default-src 'self'",
-      `script-src 'self' ${"connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com"} https://checkout.razorpay.com https://cdn.jsdelivr.net/npm`,
+      "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
